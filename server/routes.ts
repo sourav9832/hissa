@@ -55,13 +55,13 @@ export async function registerRoutes(
 
   app.post(api.expenses.create.path, isAuthenticated, async (req: any, res) => {
     const groupId = Number(req.params.groupId);
-    const { description, amount, paidByUserId, splits } = req.body;
+    const { description, amount, paidByUserId, splits, receipt } = req.body;
     
     if (!description || typeof amount !== 'number' || !paidByUserId || !splits) {
       return res.status(400).json({ message: "Invalid payload" });
     }
 
-    const expense = await storage.createExpense(groupId, description, amount, paidByUserId, splits);
+    const expense = await storage.createExpense(groupId, description, amount, paidByUserId, splits, receipt);
     res.status(201).json(expense);
   });
 

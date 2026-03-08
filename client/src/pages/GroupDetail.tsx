@@ -2,13 +2,14 @@ import { useParams } from "wouter";
 import { useGroup } from "@/hooks/use-groups";
 import { Navbar } from "@/components/layout/Navbar";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
+import { ShareDialog } from "@/components/ShareDialog";
 import { formatCurrency, getInitials, cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Receipt, Users, Link as LinkIcon, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,16 +18,6 @@ export default function GroupDetail() {
   const groupId = parseInt(params.id || "0", 10);
   const { data, isLoading, error } = useGroup(groupId);
   const { user } = useAuth();
-  const { toast } = useToast();
-
-  const handleShare = () => {
-    const url = `${window.location.origin}/groups/${groupId}/join`;
-    navigator.clipboard.writeText(url);
-    toast({ 
-      title: "Link copied to clipboard!", 
-      description: "Send this link to anyone you want to join the group." 
-    });
-  };
 
   if (isLoading) {
     return (
@@ -79,9 +70,7 @@ export default function GroupDetail() {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={handleShare} className="rounded-full shadow-sm hover:bg-secondary">
-                <LinkIcon className="w-4 h-4 mr-2 text-muted-foreground" /> Share Invite
-              </Button>
+              <ShareDialog groupId={groupId} groupName={group.name} />
               <AddExpenseDialog group={data} />
             </div>
           </div>
@@ -203,7 +192,7 @@ export default function GroupDetail() {
              <div className="bg-background rounded-3xl border border-border/50 shadow-sm p-4 sm:p-6">
                <div className="flex items-center justify-between mb-6">
                  <h3 className="text-xl font-display font-bold">Group Members</h3>
-                 <Button variant="outline" size="sm" onClick={handleShare} className="rounded-full">Add Member</Button>
+                 <ShareDialog groupId={groupId} groupName={group.name} />
                </div>
                
                <div className="grid sm:grid-cols-2 gap-4">

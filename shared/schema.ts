@@ -34,11 +34,22 @@ export const expenseSplits = pgTable("expense_splits", {
   amountOwed: integer("amount_owed").notNull(), // in cents
 });
 
+export const receipts = pgTable("receipts", {
+  id: serial("id").primaryKey(),
+  expenseId: integer("expense_id").notNull(),
+  fileName: text("file_name").notNull(),
+  fileType: text("file_type").notNull(), // mime type: image/jpeg, application/pdf, etc
+  fileData: text("file_data").notNull(), // base64 encoded
+  uploadedAt: timestamp("uploaded_at").defaultNow(),
+});
+
 export const insertGroupSchema = createInsertSchema(groups).omit({ id: true, createdAt: true });
 export const insertExpenseSchema = createInsertSchema(expenses).omit({ id: true, createdAt: true });
 export const insertExpenseSplitSchema = createInsertSchema(expenseSplits).omit({ id: true });
+export const insertReceiptSchema = createInsertSchema(receipts).omit({ id: true, uploadedAt: true });
 
 export type Group = typeof groups.$inferSelect;
 export type GroupMember = typeof groupMembers.$inferSelect;
 export type Expense = typeof expenses.$inferSelect;
 export type ExpenseSplit = typeof expenseSplits.$inferSelect;
+export type Receipt = typeof receipts.$inferSelect;

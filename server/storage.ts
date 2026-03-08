@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { 
-  groups, groupMembers, expenses, expenseSplits, users,
-  type Group, type GroupMember, type Expense, type ExpenseSplit, type User 
+  groups, groupMembers, expenses, expenseSplits, receipts, users,
+  type Group, type GroupMember, type Expense, type ExpenseSplit, type User, type Receipt
 } from "@shared/schema";
 import { eq, and, inArray } from "drizzle-orm";
 
@@ -19,9 +19,10 @@ export interface IStorage {
     description: string, 
     amount: number, 
     paidByUserId: string,
-    splits: { userId: string, amountOwed: number }[]
+    splits: { userId: string, amountOwed: number }[],
+    receipt?: { fileName: string, fileType: string, fileData: string }
   ): Promise<Expense>;
-  getGroupExpenses(groupId: number): Promise<(Expense & { splits: ExpenseSplit[] })[]>;
+  getGroupExpenses(groupId: number): Promise<(Expense & { splits: ExpenseSplit[], receipt?: Receipt })[]>;
   getGroupBalances(groupId: number): Promise<{ userId: string; netBalance: number }[]>;
 }
 
@@ -73,7 +74,8 @@ export class DatabaseStorage implements IStorage {
     description: string, 
     amount: number, 
     paidByUserId: string,
-    splits: { userId: string, amountOwed: number }[]
+    splits: { userId: string, amountOwed: number }[],
+    receipt?: { fileName: string, fileType: string, fileData: string }
   ): Promise<Expense> {
     // Need a transaction for this
     return await db.transaction(async (tx) => {
@@ -93,20 +95,32 @@ export class DatabaseStorage implements IStorage {
           }))
         );
       }
+
+      if (receipt) {
+        await tx.insert(receipts).values({
+          expenseId: expense.id,
+          fileName: receipt.fileName,
+          fileType: receipt.fileType,
+          fileData: receipt.fileData
+        });
+      }
+
       return expense;
     });
   }
 
-  async getGroupExpenses(groupId: number): Promise<(Expense & { splits: ExpenseSplit[] })[]> {
+  async getGroupExpenses(groupId: number): Promise<(Expense & { splits: ExpenseSplit[], receipt?: Receipt })[]> {
     const groupExpenses = await db.select().from(expenses).where(eq(expenses.groupId, groupId));
     if (groupExpenses.length === 0) return [];
 
     const expenseIds = groupExpenses.map(e => e.id);
     const allSplits = await db.select().from(expenseSplits).where(inArray(expenseSplits.expenseId, expenseIds));
+    const allReceipts = await db.select().from(receipts).where(inArray(receipts.expenseId, expenseIds));
 
     return groupExpenses.map(expense => ({
       ...expense,
-      splits: allSplits.filter(s => s.expenseId === expense.id)
+      splits: allSplits.filter(s => s.expenseId === expense.id),
+      receipt: allReceipts.find(r => r.expenseId === expense.id)
     }));
   }
 
