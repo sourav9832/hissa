@@ -72,7 +72,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/20 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
@@ -191,11 +191,8 @@ export default function Dashboard() {
                     
                     {/* Content */}
                     <div className="relative z-10 p-6 flex flex-col h-full justify-between">
-                      <div className="flex items-start justify-between">
-                        <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                          <span className="text-lg sm:text-xl font-bold text-white">{initials}</span>
-                        </div>
-                        <EditGroupDialog groupId={group.id} groupName={group.name} currentImage={group.imageData} />
+                      <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        <span className="text-lg sm:text-xl font-bold text-white">{initials}</span>
                       </div>
                       
                       <div>
@@ -204,6 +201,10 @@ export default function Dashboard() {
                           Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
                         </p>
                       </div>
+
+                      <Button className="rounded-full hover-lift gap-2 w-full">
+                        Manage <ArrowRight className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 </Link>

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { LogOut, Loader2 } from "lucide-react";
-import hissaLogo from "@assets/hissa-logo_1772986859900.png";
+import hissaLogo from "@assets/hissa-logo_1772991802141.png";
 
 export function Navbar() {
   const { user, logout, isLoggingOut } = useAuth();

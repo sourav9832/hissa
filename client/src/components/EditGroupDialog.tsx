@@ -45,9 +45,10 @@ interface EditGroupDialogProps {
   groupId: number;
   groupName: string;
   currentImage?: string;
+  isSmall?: boolean;
 }
 
-export function EditGroupDialog({ groupId, groupName, currentImage }: EditGroupDialogProps) {
+export function EditGroupDialog({ groupId, groupName, currentImage, isSmall }: EditGroupDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(groupName);
   const [imageData, setImageData] = useState<string | null>(currentImage || null);
@@ -101,9 +102,15 @@ export function EditGroupDialog({ groupId, groupName, currentImage }: EditGroupD
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center" title="Edit trip">
-          <Edit2 className="w-4 h-4 text-white" />
-        </button>
+        {isSmall ? (
+          <button className="p-1 rounded-lg hover:bg-primary/10 transition-colors flex items-center justify-center" title="Edit trip">
+            <Edit2 className="w-4 h-4 text-primary" />
+          </button>
+        ) : (
+          <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center" title="Edit trip">
+            <Edit2 className="w-4 h-4 text-white" />
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px] rounded-2xl">
         <DialogHeader>
