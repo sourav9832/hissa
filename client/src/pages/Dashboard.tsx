@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { useGroups, useCreateGroup } from "@/hooks/use-groups";
 import { Navbar } from "@/components/layout/Navbar";
@@ -12,21 +12,37 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Users, Plus, Loader2, ArrowRight } from "lucide-react";
+import { Users, Plus, Loader2, ArrowRight, Upload, X } from "lucide-react";
 import { format } from "date-fns";
+
+const COLORS = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-green-500', 'bg-cyan-500', 'bg-red-500', 'bg-indigo-500'];
 
 export default function Dashboard() {
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
   const [newGroupName, setNewGroupName] = useState("");
+  const [groupImage, setGroupImage] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setGroupImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGroupName.trim()) return;
     
-    await createGroup.mutateAsync({ name: newGroupName });
+    await createGroup.mutateAsync({ name: newGroupName, imageData: groupImage || undefined });
     setNewGroupName("");
+    setGroupImage(null);
     setIsDialogOpen(false);
   };
 
@@ -37,26 +53,26 @@ export default function Dashboard() {
       <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">Your Groups</h1>
+            <h1 className="text-3xl font-display font-bold text-foreground">Your Trips & Groups</h1>
             <p className="text-muted-foreground mt-1">Manage all your shared expenses here.</p>
           </div>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="rounded-full shadow-sm hover-lift pl-4 pr-5 gap-2">
-                <Plus className="w-5 h-5" /> New Group
+                <Plus className="w-5 h-5" /> New Trip
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[400px] rounded-2xl">
               <DialogHeader>
-                <DialogTitle className="font-display text-2xl">Create a group</DialogTitle>
+                <DialogTitle className="font-display text-2xl">Create a trip</DialogTitle>
                 <DialogDescription>
-                  Start a new group to track expenses with friends.
+                  Start a new trip to track expenses with friends.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreate} className="space-y-6 mt-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-semibold text-foreground">Group Name</label>
+                  <label htmlFor="name" className="text-sm font-semibold text-foreground">Trip Name</label>
                   <Input 
                     id="name"
                     placeholder="e.g. Ski Trip 2024" 
@@ -66,9 +82,42 @@ export default function Dashboard() {
                     autoFocus
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-foreground">Trip Image (Optional)</label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  {groupImage ? (
+                    <div className="relative rounded-xl overflow-hidden border-2 border-primary/20 bg-secondary/50">
+                      <img src={groupImage} alt="Trip preview" className="w-full h-32 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setGroupImage(null)}
+                        className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 rounded-full p-1 transition-colors"
+                      >
+                        <X className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full p-4 border-2 border-dashed border-border rounded-xl text-center hover:border-primary/50 transition-colors flex flex-col items-center gap-2 cursor-pointer"
+                    >
+                      <Upload className="w-5 h-5 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Click to upload an image</span>
+                    </button>
+                  )}
+                </div>
+
                 <Button type="submit" className="w-full h-12 rounded-xl text-base" disabled={!newGroupName.trim() || createGroup.isPending}>
                   {createGroup.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
-                  Create Group
+                  Create Trip
                 </Button>
               </form>
             </DialogContent>
@@ -96,23 +145,39 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {groups.map((group) => (
+            {groups.map((group, idx) => (
               <Link key={group.id} href={`/groups/${group.id}`} className="group block outline-none">
-                <div className="bg-background rounded-3xl p-6 border border-border/50 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 relative overflow-hidden h-full flex flex-col">
-                  {/* Decorative corner */}
-                  <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full group-hover:bg-primary/10 transition-colors" />
+                <div className={`rounded-3xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-full flex flex-col min-h-48 ${
+                  group.imageData ? '' : `${COLORS[idx % COLORS.length]}`
+                }`}>
+                  {/* Background image or color */}
+                  {group.imageData && (
+                    <img
+                      src={group.imageData}
+                      alt={group.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
                   
-                  <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 relative z-10">
-                    <Users className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                  </div>
+                  {/* Dark overlay for text readability */}
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
                   
-                  <h3 className="text-xl font-bold text-foreground mb-1 relative z-10 group-hover:text-primary transition-colors line-clamp-1">{group.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-6 relative z-10">
-                    Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
-                  </p>
-                  
-                  <div className="mt-auto flex items-center text-sm font-semibold text-primary/80 group-hover:text-primary transition-colors relative z-10">
-                    View details <ArrowRight className="w-4 h-4 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                  {/* Content */}
+                  <div className="relative z-10 p-6 flex flex-col h-full justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-2xl font-bold text-white mb-2 line-clamp-2 group-hover:text-white transition-colors">{group.name}</h3>
+                      <p className="text-white/80 text-sm">
+                        Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
+                      </p>
+                    </div>
+                    
+                    <div className="mt-auto flex items-center text-sm font-semibold text-white/90 group-hover:text-white transition-colors">
+                      Manage Expenses <ArrowRight className="w-4 h-4 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    </div>
                   </div>
                 </div>
               </Link>

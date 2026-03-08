@@ -20,9 +20,9 @@ export async function registerRoutes(
 
   app.post(api.groups.create.path, isAuthenticated, async (req: any, res) => {
     const userId = req.user.claims.sub;
-    const { name } = req.body;
+    const { name, imageData } = req.body;
     if (!name) return res.status(400).json({ message: "Name is required" });
-    const group = await storage.createGroup(name, userId);
+    const group = await storage.createGroup(name, userId, imageData);
     res.status(201).json(group);
   });
 

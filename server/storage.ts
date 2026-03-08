@@ -8,7 +8,7 @@ import { eq, and, inArray } from "drizzle-orm";
 export interface IStorage {
   // Groups
   getGroupsForUser(userId: string): Promise<Group[]>;
-  createGroup(name: string, userId: string): Promise<Group>;
+  createGroup(name: string, userId: string, imageData?: string): Promise<Group>;
   getGroup(id: number): Promise<Group | undefined>;
   getGroupMembers(groupId: number): Promise<(GroupMember & { user: User })[]>;
   joinGroup(groupId: number, userId: string): Promise<void>;
@@ -35,8 +35,8 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(groups).where(inArray(groups.id, groupIds));
   }
 
-  async createGroup(name: string, userId: string): Promise<Group> {
-    const [group] = await db.insert(groups).values({ name }).returning();
+  async createGroup(name: string, userId: string, imageData?: string): Promise<Group> {
+    const [group] = await db.insert(groups).values({ name, imageData }).returning();
     await db.insert(groupMembers).values({ groupId: group.id, userId });
     return group;
   }

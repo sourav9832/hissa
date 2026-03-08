@@ -5,6 +5,7 @@ import { api, buildUrl } from "@shared/routes";
 export interface Group {
   id: number;
   name: string;
+  imageData?: string;
   createdAt: string;
 }
 
@@ -75,7 +76,7 @@ export function useGroup(id: number) {
 export function useCreateGroup() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { name: string }) => {
+    mutationFn: async (data: { name: string, imageData?: string }) => {
       const res = await fetch(api.groups.create.path, {
         method: api.groups.create.method,
         headers: { "Content-Type": "application/json" },

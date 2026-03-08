@@ -8,6 +8,7 @@ import { users } from "./models/auth";
 export const groups = pgTable("groups", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
+  imageData: text("image_data"), // base64 encoded image (optional)
   createdAt: timestamp("created_at").defaultNow(),
 });
 
