@@ -3,6 +3,7 @@ import { useGroup } from "@/hooks/use-groups";
 import { Navbar } from "@/components/layout/Navbar";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { ShareDialog } from "@/components/ShareDialog";
+import { EditGroupDialog } from "@/components/EditGroupDialog";
 import { formatCurrency, getInitials, cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
@@ -70,6 +71,7 @@ export default function GroupDetail() {
             </div>
             
             <div className="flex items-center gap-3">
+              <EditGroupDialog groupId={groupId} groupName={group.name} currentImage={group.imageData} />
               <ShareDialog groupId={groupId} groupName={group.name} />
               <AddExpenseDialog group={data} />
             </div>

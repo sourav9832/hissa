@@ -9,6 +9,7 @@ export interface IStorage {
   // Groups
   getGroupsForUser(userId: string): Promise<Group[]>;
   createGroup(name: string, userId: string, imageData?: string): Promise<Group>;
+  updateGroup(id: number, name: string, imageData?: string | null): Promise<Group | undefined>;
   getGroup(id: number): Promise<Group | undefined>;
   getGroupMembers(groupId: number): Promise<(GroupMember & { user: User })[]>;
   joinGroup(groupId: number, userId: string): Promise<void>;
@@ -38,6 +39,11 @@ export class DatabaseStorage implements IStorage {
   async createGroup(name: string, userId: string, imageData?: string): Promise<Group> {
     const [group] = await db.insert(groups).values({ name, imageData }).returning();
     await db.insert(groupMembers).values({ groupId: group.id, userId });
+    return group;
+  }
+
+  async updateGroup(id: number, name: string, imageData?: string | null): Promise<Group | undefined> {
+    const [group] = await db.update(groups).set({ name, ...(imageData !== undefined && { imageData }) }).where(eq(groups.id, id)).returning();
     return group;
   }
 

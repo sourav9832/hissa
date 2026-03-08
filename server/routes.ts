@@ -26,6 +26,24 @@ export async function registerRoutes(
     res.status(201).json(group);
   });
 
+  app.patch(api.groups.get.path, isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.id);
+    const userId = req.user.claims.sub;
+    const { name, imageData } = req.body;
+    if (!name) return res.status(400).json({ message: "Name is required" });
+
+    const group = await storage.getGroup(groupId);
+    if (!group) return res.status(404).json({ message: "Group not found" });
+
+    const members = await storage.getGroupMembers(groupId);
+    if (!members.some(m => m.userId === userId)) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const updated = await storage.updateGroup(groupId, name, imageData);
+    res.json(updated);
+  });
+
   app.get(api.groups.get.path, isAuthenticated, async (req: any, res) => {
     const groupId = Number(req.params.id);
     const group = await storage.getGroup(groupId);

@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { Wallet, LogOut, Loader2 } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
+import hissaLogo from "@assets/applogo_1772982443078.jpg";
 
 export function Navbar() {
   const { user, logout, isLoggingOut } = useAuth();
@@ -19,11 +20,12 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <div className="bg-primary/10 p-2 rounded-xl text-primary">
-            <Wallet className="h-5 w-5" />
+        <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+          <img src={hissaLogo} alt="Hissa" className="h-8 w-8 object-contain" />
+          <div className="flex flex-col leading-none">
+            <span className="font-display font-bold text-lg tracking-tight">Hissa</span>
+            <span className="text-xs text-muted-foreground font-medium">Kitna tera? Kitna mera?</span>
           </div>
-          <span className="font-display font-bold text-xl tracking-tight">FairShare</span>
         </Link>
 
         {user && (

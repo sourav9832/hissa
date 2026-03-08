@@ -144,43 +144,45 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {groups.map((group, idx) => (
-              <Link key={group.id} href={`/groups/${group.id}`} className="group block outline-none">
-                <div className={`rounded-3xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-full flex flex-col min-h-48 ${
-                  group.imageData ? '' : `${COLORS[idx % COLORS.length]}`
-                }`}>
-                  {/* Background image or color */}
-                  {group.imageData && (
-                    <img
-                      src={group.imageData}
-                      alt={group.name}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  )}
-                  
-                  {/* Dark overlay for text readability */}
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
-                  
-                  {/* Content */}
-                  <div className="relative z-10 p-6 flex flex-col h-full justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                      <Users className="w-6 h-6 text-white" />
+              <div key={group.id} className={`rounded-3xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-40 flex items-center ${
+                group.imageData ? '' : `${COLORS[idx % COLORS.length]}`
+              }`}>
+                {/* Background image or color */}
+                {group.imageData && (
+                  <img
+                    src={group.imageData}
+                    alt={group.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+                
+                {/* Dark overlay for text readability */}
+                <div className="absolute inset-0 bg-black/40 hover:bg-black/50 transition-colors" />
+                
+                {/* Content */}
+                <div className="relative z-10 px-8 flex items-center justify-between w-full h-full">
+                  <div className="flex items-center gap-6 flex-1">
+                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform duration-300">
+                      <Users className="w-7 h-7 text-white" />
                     </div>
                     
                     <div>
-                      <h3 className="text-2xl font-bold text-white mb-2 line-clamp-2 group-hover:text-white transition-colors">{group.name}</h3>
+                      <h3 className="text-xl font-bold text-white mb-1">{group.name}</h3>
                       <p className="text-white/80 text-sm">
                         Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
                       </p>
                     </div>
-                    
-                    <div className="mt-auto flex items-center text-sm font-semibold text-white/90 group-hover:text-white transition-colors">
-                      Manage Expenses <ArrowRight className="w-4 h-4 ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </div>
                   </div>
+                  
+                  <Link href={`/groups/${group.id}`} className="flex-shrink-0">
+                    <Button className="rounded-full hover-lift gap-2">
+                      Manage <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}

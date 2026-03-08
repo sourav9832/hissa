@@ -20,16 +20,16 @@ export default function Landing() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  The #1 app for shared expenses
+                  The #1 app for splitting bills
                 </div>
                 
                 <h1 className="text-5xl lg:text-7xl font-display font-bold leading-[1.1] mb-6 animate-in fade-in slide-in-from-bottom-6 duration-700 delay-100">
-                  Less stress when <br/>
-                  <span className="text-gradient">sharing expenses.</span>
+                  Kitna tera? <br/>
+                  <span className="text-gradient">Kitna mera?</span>
                 </h1>
                 
                 <p className="text-lg text-muted-foreground mb-8 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-                  Keep track of your shared expenses and balances with housemates, trips, groups, friends, and family. Settle up seamlessly.
+                  Keep track of shared expenses and balances with housemates, trips, groups, friends, and family. Settle up seamlessly.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-10 duration-700 delay-300">
@@ -114,7 +114,7 @@ export default function Landing() {
       </main>
       
       <footer className="py-8 border-t border-border/50 bg-background text-center text-muted-foreground text-sm">
-        <p>© {new Date().getFullYear()} FairShare. Built for simplicity.</p>
+        <p>© {new Date().getFullYear()} Hissa. Kitna tera? Kitna mera?</p>
       </footer>
     </div>
   );
