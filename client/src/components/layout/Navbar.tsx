@@ -19,9 +19,9 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <img src={hissaLogo} alt="Hissa" className="h-10 w-auto object-contain" />
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-0 transition-opacity hover:opacity-80">
+          <img src={hissaLogo} alt="Hissa" className="h-16 w-auto object-contain" />
         </Link>
 
         {user && (

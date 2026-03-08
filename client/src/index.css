@@ -87,7 +87,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-white text-foreground antialiased;
     font-family: var(--font-sans);
   }
   h1, h2, h3, h4, h5, h6 {

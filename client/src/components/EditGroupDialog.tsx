@@ -10,9 +10,36 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Upload, X, Loader2, Settings } from "lucide-react";
+import { Upload, X, Loader2, Edit2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { buildUrl } from "@shared/routes";
+
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > 600) {
+          height = Math.round((height * 600) / width);
+          width = 600;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    };
+  });
+};
 
 interface EditGroupDialogProps {
   groupId: number;
@@ -29,14 +56,11 @@ export function EditGroupDialog({ groupId, groupName, currentImage }: EditGroupD
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setImageData(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file);
+      setImageData(compressed);
     }
   };
 
@@ -77,9 +101,9 @@ export function EditGroupDialog({ groupId, groupName, currentImage }: EditGroupD
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-full gap-2">
-          <Settings className="w-4 h-4" /> Edit
-        </Button>
+        <button className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-colors flex items-center justify-center" title="Edit trip">
+          <Edit2 className="w-4 h-4 text-white" />
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px] rounded-2xl">
         <DialogHeader>

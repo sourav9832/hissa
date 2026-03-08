@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { useGroups, useCreateGroup } from "@/hooks/use-groups";
 import { Navbar } from "@/components/layout/Navbar";
+import { EditGroupDialog } from "@/components/EditGroupDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -17,6 +18,33 @@ import { format } from "date-fns";
 
 const COLORS = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-green-500', 'bg-cyan-500', 'bg-red-500', 'bg-indigo-500'];
 
+const compressImage = (file: File): Promise<string> => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > 600) {
+          height = Math.round((height * 600) / width);
+          width = 600;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    };
+  });
+};
+
 export default function Dashboard() {
   const { data: groups, isLoading } = useGroups();
   const createGroup = useCreateGroup();
@@ -25,14 +53,11 @@ export default function Dashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setGroupImage(event.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImage(file);
+      setGroupImage(compressed);
     }
   };
 
@@ -53,7 +78,7 @@ export default function Dashboard() {
       <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">Your Trips & Groups</h1>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">Your Trips</h1>
             <p className="text-muted-foreground mt-1 text-sm sm:text-base">Manage all your shared expenses here.</p>
           </div>
           
@@ -144,46 +169,46 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-4 max-w-4xl">
-            {groups.map((group, idx) => (
-              <div key={group.id} className={`rounded-2xl sm:rounded-3xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-32 sm:h-40 flex items-center ${
-                group.imageData ? '' : `${COLORS[idx % COLORS.length]}`
-              }`}>
-                {/* Background image or color */}
-                {group.imageData && (
-                  <img
-                    src={group.imageData}
-                    alt={group.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                )}
-                
-                {/* Dark overlay for text readability */}
-                <div className="absolute inset-0 bg-black/40 hover:bg-black/50 transition-colors" />
-                
-                {/* Content */}
-                <div className="relative z-10 px-4 sm:px-8 flex items-center justify-between w-full h-full gap-3">
-                  <div className="flex items-center gap-3 sm:gap-6 flex-1 min-w-0">
-                    <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform duration-300">
-                      <Users className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
-                    </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {groups.map((group, idx) => {
+              const initials = group.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+              return (
+                <Link key={group.id} href={`/groups/${group.id}`} className="group block outline-none">
+                  <div className={`rounded-2xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-56 flex flex-col ${
+                    group.imageData ? '' : `${COLORS[idx % COLORS.length]}`
+                  }`}>
+                    {/* Background image or color */}
+                    {group.imageData && (
+                      <img
+                        src={group.imageData}
+                        alt={group.name}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    )}
                     
-                    <div className="min-w-0">
-                      <h3 className="text-base sm:text-xl font-bold text-white mb-0.5 truncate">{group.name}</h3>
-                      <p className="text-white/80 text-xs sm:text-sm">
-                        Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
-                      </p>
+                    {/* Dark overlay for text readability */}
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
+                    
+                    {/* Content */}
+                    <div className="relative z-10 p-6 flex flex-col h-full justify-between">
+                      <div className="flex items-start justify-between">
+                        <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                          <span className="text-lg sm:text-xl font-bold text-white">{initials}</span>
+                        </div>
+                        <EditGroupDialog groupId={group.id} groupName={group.name} currentImage={group.imageData} />
+                      </div>
+                      
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-1 line-clamp-2">{group.name}</h3>
+                        <p className="text-white/80 text-xs sm:text-sm">
+                          Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  
-                  <Link href={`/groups/${group.id}`} className="flex-shrink-0">
-                    <Button className="rounded-full hover-lift gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-6">
-                      Manage <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
       </main>
