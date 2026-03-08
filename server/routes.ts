@@ -36,7 +36,7 @@ export async function registerRoutes(
     const balances = await storage.getGroupBalances(groupId);
 
     res.json({
-      ...group,
+      group,
       members,
       expenses,
       balances
