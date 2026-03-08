@@ -46,14 +46,22 @@ export function EditGroupDialog({ groupId, groupName, currentImage }: EditGroupD
 
     setIsLoading(true);
     try {
+      const payload = { name };
+      if (imageData && imageData.length > 0) {
+        (payload as any).imageData = imageData;
+      }
+
       const res = await fetch(buildUrl('/api/groups/:id', { id: groupId }), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, imageData }),
+        body: JSON.stringify(payload),
         credentials: 'include',
       });
 
-      if (!res.ok) throw new Error('Failed to update group');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to update group');
+      }
       
       toast({ title: 'Group updated', description: 'Changes saved successfully.' });
       queryClient.invalidateQueries({ queryKey: ['/api/groups', groupId] });

@@ -51,10 +51,10 @@ export default function Dashboard() {
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12 max-w-5xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">Your Trips & Groups</h1>
-            <p className="text-muted-foreground mt-1">Manage all your shared expenses here.</p>
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">Your Trips & Groups</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">Manage all your shared expenses here.</p>
           </div>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -144,9 +144,9 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 max-w-4xl">
             {groups.map((group, idx) => (
-              <div key={group.id} className={`rounded-3xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-40 flex items-center ${
+              <div key={group.id} className={`rounded-2xl sm:rounded-3xl overflow-hidden border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 relative h-32 sm:h-40 flex items-center ${
                 group.imageData ? '' : `${COLORS[idx % COLORS.length]}`
               }`}>
                 {/* Background image or color */}
@@ -162,23 +162,23 @@ export default function Dashboard() {
                 <div className="absolute inset-0 bg-black/40 hover:bg-black/50 transition-colors" />
                 
                 {/* Content */}
-                <div className="relative z-10 px-8 flex items-center justify-between w-full h-full">
-                  <div className="flex items-center gap-6 flex-1">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform duration-300">
-                      <Users className="w-7 h-7 text-white" />
+                <div className="relative z-10 px-4 sm:px-8 flex items-center justify-between w-full h-full gap-3">
+                  <div className="flex items-center gap-3 sm:gap-6 flex-1 min-w-0">
+                    <div className="w-10 sm:w-14 h-10 sm:h-14 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 hover:scale-110 transition-transform duration-300">
+                      <Users className="w-5 sm:w-7 h-5 sm:h-7 text-white" />
                     </div>
                     
-                    <div>
-                      <h3 className="text-xl font-bold text-white mb-1">{group.name}</h3>
-                      <p className="text-white/80 text-sm">
+                    <div className="min-w-0">
+                      <h3 className="text-base sm:text-xl font-bold text-white mb-0.5 truncate">{group.name}</h3>
+                      <p className="text-white/80 text-xs sm:text-sm">
                         Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
                       </p>
                     </div>
                   </div>
                   
                   <Link href={`/groups/${group.id}`} className="flex-shrink-0">
-                    <Button className="rounded-full hover-lift gap-2">
-                      Manage <ArrowRight className="w-4 h-4" />
+                    <Button className="rounded-full hover-lift gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-6">
+                      Manage <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4" />
                     </Button>
                   </Link>
                 </div>

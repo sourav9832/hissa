@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Wallet, Users, ArrowRightLeft, ShieldCheck, Receipt } from "lucide-react";
+import { ArrowRight, Users, ArrowRightLeft, ShieldCheck, Receipt } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
+import landingImage from "@assets/hissa-landing_1772987072753.png";
 
 export default function Landing() {
   return (
@@ -46,31 +47,7 @@ export default function Landing() {
               </div>
               
               <div className="relative lg:ml-auto animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                {/* landing page hero app mockup representation */}
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-border/50 bg-background/50 backdrop-blur-sm p-4 w-full max-w-md mx-auto aspect-[4/3] flex flex-col">
-                   <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
-                     <div className="w-24 h-6 bg-secondary rounded animate-pulse" />
-                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary"><Users className="w-4 h-4"/></div>
-                   </div>
-                   <div className="space-y-4 flex-1">
-                     {[1,2,3].map(i => (
-                       <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-secondary/50">
-                         <div className="flex items-center gap-3">
-                           <div className="w-10 h-10 rounded-full bg-background shadow-sm" />
-                           <div className="space-y-2">
-                             <div className="w-20 h-3 bg-muted rounded" />
-                             <div className="w-12 h-2 bg-muted/50 rounded" />
-                           </div>
-                         </div>
-                         <div className="w-16 h-4 bg-primary/20 rounded" />
-                       </div>
-                     ))}
-                   </div>
-                </div>
-                
-                {/* Decorative elements */}
-                <div className="absolute -top-6 -right-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
-                <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl" />
+                <img src={landingImage} alt="Hissa App" className="w-full max-w-md mx-auto" />
               </div>
             </div>
           </div>
