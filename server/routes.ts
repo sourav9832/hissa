@@ -1,16 +1,69 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
+import type { Server } from "http";
 import { storage } from "./storage";
+import { api } from "@shared/routes";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  // Replit Auth setup
+  await setupAuth(app);
+  registerAuthRoutes(app);
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  app.get(api.groups.list.path, isAuthenticated, async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const groups = await storage.getGroupsForUser(userId);
+    res.json(groups);
+  });
+
+  app.post(api.groups.create.path, isAuthenticated, async (req: any, res) => {
+    const userId = req.user.claims.sub;
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ message: "Name is required" });
+    const group = await storage.createGroup(name, userId);
+    res.status(201).json(group);
+  });
+
+  app.get(api.groups.get.path, isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.id);
+    const group = await storage.getGroup(groupId);
+    if (!group) return res.status(404).json({ message: "Group not found" });
+
+    const members = await storage.getGroupMembers(groupId);
+    const expenses = await storage.getGroupExpenses(groupId);
+    const balances = await storage.getGroupBalances(groupId);
+
+    res.json({
+      ...group,
+      members,
+      expenses,
+      balances
+    });
+  });
+
+  app.post(api.groups.join.path, isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.id);
+    const userId = req.user.claims.sub;
+    const group = await storage.getGroup(groupId);
+    if (!group) return res.status(404).json({ message: "Group not found" });
+
+    await storage.joinGroup(groupId, userId);
+    res.json({ message: "Joined successfully" });
+  });
+
+  app.post(api.expenses.create.path, isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.groupId);
+    const { description, amount, paidByUserId, splits } = req.body;
+    
+    if (!description || typeof amount !== 'number' || !paidByUserId || !splits) {
+      return res.status(400).json({ message: "Invalid payload" });
+    }
+
+    const expense = await storage.createExpense(groupId, description, amount, paidByUserId, splits);
+    res.status(201).json(expense);
+  });
 
   return httpServer;
 }
