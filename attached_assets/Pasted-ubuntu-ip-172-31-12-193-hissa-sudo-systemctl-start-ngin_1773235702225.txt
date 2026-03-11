@@ -1,0 +1,39 @@
+ubuntu@ip-172-31-12-193:~/hissa$ sudo systemctl start nginxt nginx
+sudo systemctl status nginx
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-03-11 12:57:31 UTC; 29min ago
+       Docs: man:nginx(8)
+   Main PID: 608 (nginx)
+      Tasks: 3 (limit: 1013)
+     Memory: 5.5M (peak: 6.2M)
+        CPU: 86ms
+     CGroup: /system.slice/nginx.service
+             ├─608 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─610 "nginx: worker process"
+             └─611 "nginx: worker process"
+
+Mar 11 12:57:30 ip-172-31-12-193 systemd[1]: Starting nginx.service - A high performance web server and a reverse proxy server...
+Mar 11 12:57:31 ip-172-31-12-193 systemd[1]: Started nginx.service - A high performance web server and a reverse proxy server.
+ubuntu@ip-172-31-12-193:~/hissa$ sudo certbot --nginx -d hissa.guru -d www.hissa.guru
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Certificate not yet due for renewal
+
+You have an existing certificate that has exactly the same domains or certificate name you requested and isn't close to expiry.
+(ref: /etc/letsencrypt/renewal/hissa.guru.conf)
+
+What would you like to do?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: Attempt to reinstall this existing certificate
+2: Renew & replace the certificate (may be subject to CA rate limits)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate number [1-2] then [enter] (press 'c' to cancel): 1
+Deploying certificate
+Successfully deployed certificate for hissa.guru to /etc/nginx/sites-enabled/hissa
+Successfully deployed certificate for www.hissa.guru to /etc/nginx/sites-enabled/hissa
+Congratulations! You have successfully enabled HTTPS on https://hissa.guru and https://www.hissa.guru
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+If you like Certbot, please consider supporting our work by:
+ * Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+ * Donating to EFF:                    https://eff.org/donate-le
