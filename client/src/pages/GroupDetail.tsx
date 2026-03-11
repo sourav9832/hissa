@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2, Trash2, UserMinus, Paperclip } from "lucide-react";
+import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2, Trash2, UserMinus, Paperclip, Lightbulb, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,6 +26,7 @@ export default function GroupDetail() {
   const removeMember = useRemoveMember();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showSettlingTip, setShowSettlingTip] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<{ userId: string; name: string } | null>(null);
 
   if (isLoading) {
@@ -77,6 +78,34 @@ export default function GroupDetail() {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     }
     setMemberToRemove(null);
+  };
+
+  const getSettlements = () => {
+    if (!balances || balances.length === 0) return [];
+    const debtors = balances.filter(b => b.netBalance < 0).map(b => ({ ...b, netBalance: Math.abs(b.netBalance) }));
+    const creditors = balances.filter(b => b.netBalance > 0).map(b => ({ ...b }));
+    debtors.sort((a, b) => b.netBalance - a.netBalance);
+    creditors.sort((a, b) => b.netBalance - a.netBalance);
+
+    const settlements: { from: string; to: string; amount: number }[] = [];
+    let i = 0, j = 0;
+    while (i < debtors.length && j < creditors.length) {
+      const amount = Math.min(debtors[i].netBalance, creditors[j].netBalance);
+      if (amount > 0) {
+        settlements.push({ from: debtors[i].userId, to: creditors[j].userId, amount });
+      }
+      debtors[i].netBalance -= amount;
+      creditors[j].netBalance -= amount;
+      if (debtors[i].netBalance === 0) i++;
+      if (creditors[j].netBalance === 0) j++;
+    }
+    return settlements;
+  };
+
+  const getMemberFirstName = (userId: string) => {
+    if (userId === user?.id) return "You";
+    const member = members.find(m => m.userId === userId)?.user;
+    return member?.firstName || member?.email || "Unknown";
   };
 
   return (
@@ -191,7 +220,21 @@ export default function GroupDetail() {
 
           <TabsContent value="balances" className="focus-visible:outline-none focus-visible:ring-0">
             <div className="bg-background rounded-3xl border border-border/50 shadow-sm p-4 sm:p-6">
-              <h3 className="text-xl font-display font-bold mb-6">Who owes what?</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-display font-bold">Who owes what?</h3>
+                {balances && balances.some(b => b.netBalance !== 0) && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full gap-1.5 text-primary border-primary/30 hover:bg-primary/10"
+                    onClick={() => setShowSettlingTip(true)}
+                    data-testid="button-settling-tip"
+                  >
+                    <Lightbulb className="w-4 h-4" />
+                    Settling Tip
+                  </Button>
+                )}
+              </div>
               
               {!balances || balances.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">Balances are settled or no expenses exist.</p>
@@ -199,7 +242,7 @@ export default function GroupDetail() {
                 <div className="space-y-4">
                   {balances.map((balance) => {
                     const member = members.find(m => m.userId === balance.userId)?.user;
-                    const name = balance.userId === user?.id ? "You" : (member?.firstName ? `${member.firstName} ${member.lastName || ''}` : member?.email || 'Unknown');
+                    const name = balance.userId === user?.id ? "You" : (member?.firstName || member?.email || 'Unknown');
                     const isOwed = balance.netBalance > 0;
                     const owes = balance.netBalance < 0;
                     const settled = balance.netBalance === 0;
@@ -340,6 +383,45 @@ export default function GroupDetail() {
               data-testid="button-confirm-remove-member"
             >
               {removeMember.isPending ? "Removing..." : "Remove Member"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSettlingTip} onOpenChange={setShowSettlingTip}>
+        <DialogContent className="sm:max-w-[450px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-primary" />
+              Settling Tip
+            </DialogTitle>
+            <DialogDescription>
+              Here's the simplest way to settle up all balances with the fewest transactions.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 mt-2">
+            {getSettlements().length === 0 ? (
+              <div className="text-center py-6">
+                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+                <p className="font-semibold text-lg">All settled up!</p>
+                <p className="text-sm text-muted-foreground">No payments needed.</p>
+              </div>
+            ) : (
+              getSettlements().map((s, idx) => (
+                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-secondary/30 gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="font-semibold truncate">{getMemberFirstName(s.from)}</span>
+                    <ArrowRight className="w-4 h-4 text-primary shrink-0" />
+                    <span className="font-semibold truncate">{getMemberFirstName(s.to)}</span>
+                  </div>
+                  <span className="font-display font-bold text-primary text-lg shrink-0">{formatCurrency(s.amount)}</span>
+                </div>
+              ))
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" className="rounded-full" onClick={() => setShowSettlingTip(false)}>
+              Got it
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { useJoinGroup } from "@/hooks/use-groups";
 import { useAuth } from "@/hooks/use-auth";
@@ -29,23 +30,33 @@ export default function JoinGroup() {
   const { data, isLoading, error } = previewQuery;
   const joinGroup = useJoinGroup();
   const { toast } = useToast();
+  const autoJoinAttempted = useRef(false);
 
-  const handleJoin = async () => {
-    try {
-      await joinGroup.mutateAsync(groupId);
-      toast({ title: "Joined successfully", description: "You are now a member of this group." });
-      setLocation(`/groups/${groupId}`);
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+  const isAlreadyMember = data?.members?.some((m: any) => m.userId === user?.id);
+
+  useEffect(() => {
+    if (user && data && !isAlreadyMember && !autoJoinAttempted.current && !joinGroup.isPending) {
+      autoJoinAttempted.current = true;
+      joinGroup.mutateAsync(groupId).then(() => {
+        toast({ title: "Joined successfully!", description: `You are now a member of "${data.group.name}".` });
+        setLocation(`/groups/${groupId}`);
+      }).catch((err: any) => {
+        if (err.message?.includes("already a member")) {
+          setLocation(`/groups/${groupId}`);
+        } else {
+          toast({ title: "Error", description: err.message, variant: "destructive" });
+        }
+      });
     }
-  };
+  }, [user, data, isAlreadyMember]);
 
-  if (isLoading) {
+  if (isLoading || (user && !isAlreadyMember && data)) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex flex-col items-center justify-center gap-3">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          {user && data && <p className="text-muted-foreground">Joining {data.group.name}...</p>}
         </div>
       </div>
     );
@@ -66,8 +77,6 @@ export default function JoinGroup() {
       </div>
     );
   }
-
-  const isAlreadyMember = data.members.some(m => m.userId === user?.id);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -104,22 +113,25 @@ export default function JoinGroup() {
                 asChild
                 className="w-full h-14 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 hover-lift"
               >
-                <a href={`/api/login?returnTo=/groups/${groupId}/join`}>Sign in with Google to Join</a>
+                <a href={`/api/login?returnTo=/groups/${groupId}/join`} data-testid="button-google-join">Sign in with Google to Join</a>
               </Button>
             ) : isAlreadyMember ? (
               <div className="space-y-4">
                 <div className="bg-secondary/50 text-foreground font-medium py-3 rounded-xl">
                   You are already a member!
                 </div>
-                <Button asChild className="w-full h-12 rounded-xl text-lg hover-lift">
+                <Button asChild className="w-full h-12 rounded-xl text-lg hover-lift" data-testid="button-view-group">
                   <Link href={`/groups/${groupId}`}>View Group</Link>
                 </Button>
               </div>
             ) : (
               <Button 
-                onClick={handleJoin} 
+                onClick={() => {
+                  autoJoinAttempted.current = false;
+                }}
                 disabled={joinGroup.isPending}
                 className="w-full h-14 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 hover-lift"
+                data-testid="button-accept-join"
               >
                 {joinGroup.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
                 Accept Invite & Join

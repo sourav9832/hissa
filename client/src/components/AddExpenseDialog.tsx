@@ -114,26 +114,28 @@ export function AddExpenseDialog({ group }: { group: GroupDetails }) {
 
       // Add receipt if provided
       if (receipt) {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          expenseData.receipt = {
-            fileName: receipt.name,
-            fileType: receipt.type,
-            fileData: reader.result as string, // base64
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            const base64Data = result.includes(",") ? result.split(",")[1] : result;
+            resolve(base64Data);
           };
-          await createExpense.mutateAsync(expenseData);
-          toast({ title: "Expense added", description: "Successfully split among the group." });
-          setOpen(false);
-          form.reset();
-          setReceipt(null);
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          reader.readAsDataURL(receipt);
+        });
+        expenseData.receipt = {
+          fileName: receipt.name,
+          fileType: receipt.type,
+          fileData: base64,
         };
-        reader.readAsDataURL(receipt);
-      } else {
-        await createExpense.mutateAsync(expenseData);
-        toast({ title: "Expense added", description: "Successfully split among the group." });
-        setOpen(false);
-        form.reset();
       }
+
+      await createExpense.mutateAsync(expenseData);
+      toast({ title: "Expense added", description: "Successfully split among the group." });
+      setOpen(false);
+      form.reset();
+      setReceipt(null);
     } catch (error: any) {
       toast({ title: "Failed to add expense", description: error.message, variant: "destructive" });
     }
