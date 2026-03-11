@@ -1,0 +1,36 @@
+ubuntu@ip-172-31-12-193:~/hissa$ cd ~/hissa
+git pull origin main
+pm2 restart hissa
+remote: Enumerating objects: 39, done.
+remote: Counting objects: 100% (39/39), done.
+remote: Compressing objects: 100% (7/7), done.
+remote: Total 21 (delta 14), reused 21 (delta 14), pack-reused 0 (from 0)
+Unpacking objects: 100% (21/21), 179.91 KiB | 3.27 MiB/s, done.
+From https://github.com/sourav9832/hissa
+ * branch            main       -> FETCH_HEAD
+   7da3fe2..18a4f6c  main       -> origin/main
+Updating 7da3fe2..18a4f6c
+Fast-forward
+ client/src/App.tsx                                          |  3 +--
+ client/src/hooks/use-groups.ts                              |  8 ++++++++
+ client/src/pages/GroupDetail.tsx                            | 32 ++++++++++++++++++++++----------
+ client/src/pages/JoinGroup.tsx                              | 29 +++++++++++++++++++++++++----
+ dist/index.cjs                                              | 16 ++++++++--------
+ dist/public/assets/index-BhbqCyw8.css                       |  1 +
+ dist/public/assets/{index-BsAC64dm.js => index-CZswCNnR.js} | 26 +++++++++++++-------------
+ dist/public/assets/index-CalXnRcL.css                       |  1 -
+ dist/public/index.html                                      |  4 ++--
+ server/auth/googleAuth.ts                                   | 19 +++++++++++++------
+ server/routes.ts                                            | 38 +++++++++++++++++++++++++++++++++++++-
+ 11 files changed, 130 insertions(+), 47 deletions(-)
+ create mode 100644 dist/public/assets/index-BhbqCyw8.css
+ rename dist/public/assets/{index-BsAC64dm.js => index-CZswCNnR.js} (64%)
+ delete mode 100644 dist/public/assets/index-CalXnRcL.css
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [hissa](ids: [ 0 ])
+[PM2] [hissa](0) ✓
+┌────┬──────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name     │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼──────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ hissa    │ default     │ N/A     │ fork    │ 11866    │ 0s     │ 2    │ online    │ 0%       │ 18.1mb   │ ubuntu   │ disabled │
+└────┴──────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
