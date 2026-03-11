@@ -21,7 +21,7 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: "auto" as any,
+      secure: false,
       sameSite: "lax" as const,
       maxAge: sessionTtl,
     },
