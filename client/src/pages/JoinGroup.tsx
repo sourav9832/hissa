@@ -3,7 +3,7 @@ import { useGroup, useJoinGroup } from "@/hooks/use-groups";
 import { useAuth } from "@/hooks/use-auth";
 import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
-import { Users, AlertCircle, Loader2 } from "lucide-react";
+import { Users, AlertCircle, Loader2, Mountain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 
@@ -61,9 +61,21 @@ export default function JoinGroup() {
       
       <main className="flex-1 flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md bg-card rounded-3xl border border-border shadow-xl p-8 text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+          {data.group.imageData ? (
+            <div className="absolute top-0 left-0 w-full h-40 overflow-hidden">
+              <img src={data.group.imageData} alt={data.group.name} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-background" />
+            </div>
+          ) : (
+            <div className="absolute top-0 left-0 w-full h-40 overflow-hidden">
+              <div className="w-full h-full bg-gradient-to-br from-primary/20 via-blue-500/10 to-cyan-500/20 flex items-center justify-center">
+                <Mountain className="w-16 h-16 text-primary/30" />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
+            </div>
+          )}
           
-          <div className="w-20 h-20 bg-background border border-border shadow-sm rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10">
+          <div className="w-20 h-20 bg-background border border-border shadow-sm rounded-2xl flex items-center justify-center mx-auto mb-6 relative z-10 mt-20">
             <Users className="w-10 h-10 text-primary" />
           </div>
           

@@ -22,7 +22,7 @@ export function ShareDialog({ groupId, groupName }: ShareDialogProps) {
 
   const shareUrl = `${window.location.origin}/groups/${groupId}/join`;
   const encodedUrl = encodeURIComponent(shareUrl);
-  const encodedMessage = encodeURIComponent(`Join my group "${groupName}" on FairShare! ${shareUrl}`);
+  const encodedMessage = encodeURIComponent(`Join my group "${groupName}" on Hissa! ${shareUrl}`);
 
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(shareUrl);
@@ -31,7 +31,7 @@ export function ShareDialog({ groupId, groupName }: ShareDialogProps) {
   };
 
   const handleEmailShare = () => {
-    window.location.href = `mailto:?subject=Join ${groupName} on FairShare&body=${encodeURIComponent(`Join my group "${groupName}" on FairShare!\n\n${shareUrl}`)}`;
+    window.location.href = `mailto:?subject=Join ${groupName} on Hissa&body=${encodeURIComponent(`Join my group "${groupName}" on Hissa!\n\n${shareUrl}`)}`;
   };
 
   const handleWhatsAppShare = () => {
