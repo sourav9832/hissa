@@ -1,0 +1,46 @@
+git pull origin main
+pm2 restart hissa
+pm2 logs hissa --lines 3
+remote: Enumerating objects: 33, done.
+remote: Counting objects: 100% (33/33), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 18 (delta 12), reused 18 (delta 12), pack-reused 0 (from 0)
+Unpacking objects: 100% (18/18), 178.43 KiB | 2.35 MiB/s, done.
+From https://github.com/sourav9832/hissa
+ * branch            main       -> FETCH_HEAD
+   2c0aa88..68a9d68  main       -> origin/main
+Updating 2c0aa88..68a9d68
+Fast-forward
+ client/src/components/AddExpenseDialog.tsx | 36 +++++++++++++++++++-----------------
+ client/src/pages/GroupDetail.tsx           | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ client/src/pages/JoinGroup.tsx             | 42 +++++++++++++++++++++++++++---------------
+ dist/index.cjs                             |  2 +-
+ dist/public/assets/index-B8cu-KLs.css      |  1 +
+ dist/public/assets/index-BhbqCyw8.css      |  1 -
+ dist/public/assets/index-CZswCNnR.js       | 56 --------------------------------------------------------
+ dist/public/assets/index-DJWnJlV8.js       | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ dist/public/index.html                     |  4 ++--
+ server/index.ts                            |  1 +
+ 10 files changed, 192 insertions(+), 95 deletions(-)
+ create mode 100644 dist/public/assets/index-B8cu-KLs.css
+ delete mode 100644 dist/public/assets/index-BhbqCyw8.css
+ delete mode 100644 dist/public/assets/index-CZswCNnR.js
+ create mode 100644 dist/public/assets/index-DJWnJlV8.js
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [hissa](ids: [ 0 ])
+[PM2] [hissa](0) ✓
+┌────┬──────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name     │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼──────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ hissa    │ default     │ N/A     │ fork    │ 12291    │ 0s     │ 4    │ online    │ 0%       │ 14.0mb   │ ubuntu   │ disabled │
+└────┴──────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[TAILING] Tailing last 3 lines for [hissa] process (change the value with --lines option)
+/home/ubuntu/.pm2/logs/hissa-error.log last 3 lines:
+0|hissa    |   limit: 102400,
+0|hissa    |   type: 'entity.too.large'
+0|hissa    | }
+
+/home/ubuntu/.pm2/logs/hissa-out.log last 3 lines:
+0|hissa    | 646428334302721805","amountOwed":12500}]},{"id":10,"groupId":1,"paidByUserId":"117499164537142906938","description":"Misc","amount":50000,"createdAt":"2026-03-11T15:05:58.928Z","splits":[{"id":19,"expenseId":10,"userId":"106340019628481242889","amountOwed":16667},{"id":20,"expenseId":10,"userId":"106646428334302721805","amountOwed":16667},{"id":21,"expenseId":10,"userId":"117499164537142906938","amountOwed":16666}]}],"balances":[{"userId":"106340019628481242889","netBalance":-214567},{"userId":"106646428334302721805","netBalance":181233},{"userId":"117499164537142906938","netBalance":33334}]}
+
+0|hissa  | 3:49:03 PM [express] serving on port 5000
