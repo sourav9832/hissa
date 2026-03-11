@@ -1,0 +1,64 @@
+                          Runtime Edition
+
+        PM2 is a Production Process Manager for Node.js applications
+                     with a built-in Load Balancer.
+
+                Start and Daemonize any application:
+                $ pm2 start app.js
+
+                Load Balance 4 instances of api.js:
+                $ pm2 start api.js -i 4
+
+                Monitor in production:
+                $ pm2 monitor
+
+                Make pm2 auto-boot at server restart:
+                $ pm2 startup
+
+                To go further checkout:
+                http://pm2.io/
+
+
+                        -------------
+
+[PM2] Spawning PM2 daemon with pm2_home=/home/ubuntu/.pm2
+[PM2] PM2 Successfully daemonized
+[PM2] Starting /home/ubuntu/hissa/dist/index.cjs in fork_mode (1 instance)
+[PM2] Done.
+┌────┬──────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name     │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼──────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ hissa    │ default     │ 1.0.0   │ fork    │ 23265    │ 0s     │ 0    │ online    │ 0%       │ 30.0mb   │ ubuntu   │ disabled │
+└────┴──────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /home/ubuntu/.pm2/dump.pm2
+[PM2] Init System found: systemd
+[PM2] To setup the Startup Script, copy/paste the following command:
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+ubuntu@ip-172-31-12-193:~/hissa$ pm2 start dist/index.cjs --name "hissa"
+pm2 save
+pm2 startup
+[PM2][ERROR] Script already launched, add -f option to force re-execution
+[PM2] Saving current process list...
+[PM2] Successfully saved in /home/ubuntu/.pm2/dump.pm2
+[PM2] Init System found: systemd
+[PM2] To setup the Startup Script, copy/paste the following command:
+sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu
+ubuntu@ip-172-31-12-193:~/hissa$ curl http://localhost:5000
+curl: (7) Failed to connect to localhost port 5000 after 0 ms: Couldn't connect to server
+ubuntu@ip-172-31-12-193:~/hissa$ pm2 logs hissa --lines 20
+[TAILING] Tailing last 20 lines for [hissa] process (change the value with --lines option)
+/home/ubuntu/.pm2/logs/hissa-out.log last 20 lines:
+/home/ubuntu/.pm2/logs/hissa-error.log last 20 lines:
+0|hissa    | Error: DATABASE_URL must be set. Did you forget to provision a database?
+0|hissa    |     at Object.<anonymous> (/home/ubuntu/hissa/dist/index.cjs:80:101799)
+0|hissa    |     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+0|hissa    |     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+0|hissa    |     at Module.load (node:internal/modules/cjs/loader:1266:32)
+0|hissa    |     at Module._load (node:internal/modules/cjs/loader:1091:12)
+0|hissa    |     at cjsLoader (node:internal/modules/esm/translators:298:15)
+0|hissa    |     at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:240:7)
+0|hissa    |     at ModuleJob.run (node:internal/modules/esm/module_job:325:25)
+0|hissa    |     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+0|hissa    |     at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+
