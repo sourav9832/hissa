@@ -14,6 +14,9 @@ export interface IStorage {
   getGroupMembers(groupId: number): Promise<(GroupMember & { user: User })[]>;
   joinGroup(groupId: number, userId: string): Promise<void>;
   
+  deleteGroup(groupId: number): Promise<void>;
+  removeMember(groupId: number, userId: string): Promise<void>;
+  
   // Expenses
   createExpense(
     groupId: number, 
@@ -73,6 +76,26 @@ export class DatabaseStorage implements IStorage {
     if (existing.length === 0) {
       await db.insert(groupMembers).values({ groupId, userId });
     }
+  }
+
+  async deleteGroup(groupId: number): Promise<void> {
+    await db.transaction(async (tx) => {
+      const groupExpenses = await tx.select().from(expenses).where(eq(expenses.groupId, groupId));
+      if (groupExpenses.length > 0) {
+        const expenseIds = groupExpenses.map(e => e.id);
+        await tx.delete(receipts).where(inArray(receipts.expenseId, expenseIds));
+        await tx.delete(expenseSplits).where(inArray(expenseSplits.expenseId, expenseIds));
+        await tx.delete(expenses).where(eq(expenses.groupId, groupId));
+      }
+      await tx.delete(groupMembers).where(eq(groupMembers.groupId, groupId));
+      await tx.delete(groups).where(eq(groups.id, groupId));
+    });
+  }
+
+  async removeMember(groupId: number, userId: string): Promise<void> {
+    await db.delete(groupMembers).where(
+      and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId))
+    );
   }
 
   async createExpense(

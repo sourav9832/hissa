@@ -69,6 +69,47 @@ export async function registerRoutes(
     res.json({ message: "Joined successfully" });
   });
 
+  app.delete("/api/groups/:id", isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.id);
+    const userId = req.user.id;
+
+    const group = await storage.getGroup(groupId);
+    if (!group) return res.status(404).json({ message: "Group not found" });
+
+    const members = await storage.getGroupMembers(groupId);
+    const sorted = [...members].sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime());
+    if (sorted.length === 0 || sorted[0].userId !== userId) {
+      return res.status(403).json({ message: "Only the trip creator can delete this group" });
+    }
+
+    await storage.deleteGroup(groupId);
+    res.json({ message: "Group deleted" });
+  });
+
+  app.delete("/api/groups/:id/members/:userId", isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.id);
+    const targetUserId = req.params.userId;
+    const currentUserId = req.user.id;
+
+    const group = await storage.getGroup(groupId);
+    if (!group) return res.status(404).json({ message: "Group not found" });
+
+    const members = await storage.getGroupMembers(groupId);
+    const sorted = [...members].sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime());
+    const isCreator = sorted.length > 0 && sorted[0].userId === currentUserId;
+
+    if (!isCreator && targetUserId !== currentUserId) {
+      return res.status(403).json({ message: "Only the trip creator can remove members" });
+    }
+
+    if (isCreator && targetUserId === currentUserId) {
+      return res.status(400).json({ message: "Creator cannot leave the group. Delete the group instead." });
+    }
+
+    await storage.removeMember(groupId, targetUserId);
+    res.json({ message: "Member removed" });
+  });
+
   app.post(api.expenses.create.path, isAuthenticated, async (req: any, res) => {
     const groupId = Number(req.params.groupId);
     const { description, amount, paidByUserId, splits, receipt } = req.body;

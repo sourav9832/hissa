@@ -92,6 +92,47 @@ export function useCreateGroup() {
   });
 }
 
+export function useDeleteGroup() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const url = buildUrl(api.groups.get.path, { id });
+      const res = await fetch(url, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ message: "Failed to delete group" }));
+        throw new Error(error.message || "Failed to delete group");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [api.groups.list.path] });
+    },
+  });
+}
+
+export function useRemoveMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ groupId, userId }: { groupId: number; userId: string }) => {
+      const res = await fetch(`/api/groups/${groupId}/members/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ message: "Failed to remove member" }));
+        throw new Error(error.message || "Failed to remove member");
+      }
+      return res.json();
+    },
+    onSuccess: (_, { groupId }) => {
+      queryClient.invalidateQueries({ queryKey: [api.groups.get.path, groupId] });
+    },
+  });
+}
+
 export function useJoinGroup() {
   const queryClient = useQueryClient();
   return useMutation({

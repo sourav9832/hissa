@@ -1,5 +1,6 @@
-import { useParams } from "wouter";
-import { useGroup } from "@/hooks/use-groups";
+import { useState } from "react";
+import { useParams, useLocation } from "wouter";
+import { useGroup, useDeleteGroup, useRemoveMember } from "@/hooks/use-groups";
 import { Navbar } from "@/components/layout/Navbar";
 import { AddExpenseDialog } from "@/components/AddExpenseDialog";
 import { ShareDialog } from "@/components/ShareDialog";
@@ -10,15 +11,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2, Trash2, UserMinus } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
 export default function GroupDetail() {
   const params = useParams();
+  const [, setLocation] = useLocation();
   const groupId = parseInt(params.id || "0", 10);
   const { data, isLoading, error } = useGroup(groupId);
   const { user } = useAuth();
+  const deleteGroup = useDeleteGroup();
+  const removeMember = useRemoveMember();
+  const { toast } = useToast();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<{ userId: string; name: string } | null>(null);
 
   if (isLoading) {
     return (
@@ -45,6 +53,31 @@ export default function GroupDetail() {
   }
 
   const { group, members, expenses, balances } = data;
+  const sortedMembers = [...members].sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime());
+  const creatorId = sortedMembers.length > 0 ? sortedMembers[0].userId : null;
+  const isCreator = creatorId === user?.id;
+
+  const handleDeleteGroup = async () => {
+    try {
+      await deleteGroup.mutateAsync(groupId);
+      toast({ title: "Trip deleted", description: `"${group.name}" has been deleted.` });
+      setLocation("/");
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+    setShowDeleteDialog(false);
+  };
+
+  const handleRemoveMember = async () => {
+    if (!memberToRemove) return;
+    try {
+      await removeMember.mutateAsync({ groupId, userId: memberToRemove.userId });
+      toast({ title: "Member removed", description: `${memberToRemove.name} has been removed from the group.` });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
+    setMemberToRemove(null);
+  };
 
   return (
     <div className="min-h-screen bg-secondary/20 flex flex-col pb-20">
@@ -76,6 +109,17 @@ export default function GroupDetail() {
             <div className="flex items-center gap-3">
               <ShareDialog groupId={groupId} groupName={group.name} />
               <AddExpenseDialog group={data} />
+              {isCreator && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="rounded-full text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30"
+                  onClick={() => setShowDeleteDialog(true)}
+                  data-testid="button-delete-group"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -202,6 +246,7 @@ export default function GroupDetail() {
                <div className="grid sm:grid-cols-2 gap-4">
                  {members.map(m => {
                    const isMe = m.userId === user?.id;
+                   const isMemberCreator = m.userId === creatorId;
                    const name = m.user?.firstName ? `${m.user.firstName} ${m.user.lastName || ''}` : m.user?.email || 'Unknown User';
                    
                    return (
@@ -210,10 +255,25 @@ export default function GroupDetail() {
                           <AvatarImage src={m.user?.profileImageUrl} />
                           <AvatarFallback className="bg-primary/10 text-primary">{getInitials(name)}</AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-semibold">{name} {isMe && <span className="text-muted-foreground text-sm font-normal ml-1">(You)</span>}</p>
+                        <div className="flex-1">
+                          <p className="font-semibold">
+                            {name} 
+                            {isMe && <span className="text-muted-foreground text-sm font-normal ml-1">(You)</span>}
+                            {isMemberCreator && <span className="text-primary text-xs font-medium ml-1">• Creator</span>}
+                          </p>
                           <p className="text-xs text-muted-foreground">Joined {format(new Date(m.joinedAt), 'MMM d, yyyy')}</p>
                         </div>
+                        {isCreator && !isMemberCreator && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full h-8 w-8"
+                            onClick={() => setMemberToRemove({ userId: m.userId, name })}
+                            data-testid={`button-remove-member-${m.userId}`}
+                          >
+                            <UserMinus className="w-4 h-4" />
+                          </Button>
+                        )}
                      </div>
                    )
                  })}
@@ -222,6 +282,56 @@ export default function GroupDetail() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[400px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Delete Trip</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{group.name}"? This will permanently remove all expenses, balances, and members. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" className="rounded-full" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="rounded-full"
+              onClick={handleDeleteGroup}
+              disabled={deleteGroup.isPending}
+              data-testid="button-confirm-delete-group"
+            >
+              {deleteGroup.isPending ? "Deleting..." : "Delete Trip"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!memberToRemove} onOpenChange={(open) => !open && setMemberToRemove(null)}>
+        <DialogContent className="sm:max-w-[400px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl">Remove Member</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove {memberToRemove?.name} from "{group.name}"? They can rejoin later using an invite link.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" className="rounded-full" onClick={() => setMemberToRemove(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="rounded-full"
+              onClick={handleRemoveMember}
+              disabled={removeMember.isPending}
+              data-testid="button-confirm-remove-member"
+            >
+              {removeMember.isPending ? "Removing..." : "Remove Member"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
