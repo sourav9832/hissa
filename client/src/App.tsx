@@ -23,16 +23,15 @@ function Router() {
     );
   }
 
-  // Not logged in -> Show Landing Page
   if (!user) {
     return (
       <Switch>
+        <Route path="/groups/:id/join" component={JoinGroup} />
         <Route component={Landing} />
       </Switch>
     );
   }
 
-  // Logged in -> Authenticated Routes
   return (
     <Switch>
       <Route path="/" component={Dashboard} />

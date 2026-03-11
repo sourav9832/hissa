@@ -42,14 +42,31 @@ export async function registerRoutes(
     res.json(updated);
   });
 
+  app.get("/api/groups/:id/preview", async (req: any, res) => {
+    const groupId = Number(req.params.id);
+    const group = await storage.getGroup(groupId);
+    if (!group) return res.status(404).json({ message: "Group not found" });
+
+    const members = await storage.getGroupMembers(groupId);
+    res.json({
+      group: { id: group.id, name: group.name, imageData: group.imageData, createdAt: group.createdAt },
+      members: members.map(m => ({ id: m.id, userId: m.userId, joinedAt: m.joinedAt })),
+    });
+  });
+
   app.get(api.groups.get.path, isAuthenticated, async (req: any, res) => {
     const groupId = Number(req.params.id);
     const group = await storage.getGroup(groupId);
     if (!group) return res.status(404).json({ message: "Group not found" });
 
     const members = await storage.getGroupMembers(groupId);
-    const expenses = await storage.getGroupExpenses(groupId);
+    const rawExpenses = await storage.getGroupExpenses(groupId);
     const balances = await storage.getGroupBalances(groupId);
+
+    const expenses = rawExpenses.map(e => ({
+      ...e,
+      receipt: e.receipt ? { id: e.receipt.id, fileName: e.receipt.fileName, fileType: e.receipt.fileType } : undefined,
+    }));
 
     res.json({
       group,
@@ -108,6 +125,25 @@ export async function registerRoutes(
 
     await storage.removeMember(groupId, targetUserId);
     res.json({ message: "Member removed" });
+  });
+
+  app.get("/api/groups/:groupId/expenses/:expenseId/receipt", isAuthenticated, async (req: any, res) => {
+    const groupId = Number(req.params.groupId);
+    const expenseId = Number(req.params.expenseId);
+    const members = await storage.getGroupMembers(groupId);
+    if (!members.some(m => m.userId === req.user.id)) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    const expenseList = await storage.getGroupExpenses(groupId);
+    const expense = expenseList.find(e => e.id === expenseId);
+    if (!expense || !expense.receipt) {
+      return res.status(404).json({ message: "Receipt not found" });
+    }
+    const receipt = expense.receipt;
+    const buffer = Buffer.from(receipt.fileData, "base64");
+    res.setHeader("Content-Type", receipt.fileType);
+    res.setHeader("Content-Disposition", `inline; filename="${receipt.fileName}"`);
+    res.send(buffer);
   });
 
   app.post(api.expenses.create.path, isAuthenticated, async (req: any, res) => {

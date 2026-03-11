@@ -72,17 +72,24 @@ export async function setupAuth(app: Express) {
     }
   });
 
-  app.get("/api/login", passport.authenticate("google", {
-    scope: ["profile", "email"],
-    prompt: "select_account",
-  }));
+  app.get("/api/login", (req: any, res, next) => {
+    if (req.query.returnTo) {
+      req.session.returnTo = req.query.returnTo;
+    }
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      prompt: "select_account",
+    })(req, res, next);
+  });
 
   app.get("/api/auth/google/callback",
     passport.authenticate("google", {
       failureRedirect: "/",
     }),
-    (_req, res) => {
-      res.redirect("/");
+    (req: any, res) => {
+      const returnTo = req.session.returnTo || "/";
+      delete req.session.returnTo;
+      res.redirect(returnTo);
     }
   );
 

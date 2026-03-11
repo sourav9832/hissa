@@ -1,19 +1,33 @@
 import { useParams, useLocation } from "wouter";
-import { useGroup, useJoinGroup } from "@/hooks/use-groups";
+import { useJoinGroup } from "@/hooks/use-groups";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Users, AlertCircle, Loader2, Mountain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 
+function useGroupPreview(id: number) {
+  return useQuery({
+    queryKey: ["/api/groups/preview", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/groups/${id}/preview`);
+      if (!res.ok) throw new Error("Group not found");
+      return res.json();
+    },
+    enabled: !!id,
+  });
+}
+
 export default function JoinGroup() {
   const params = useParams();
   const [, setLocation] = useLocation();
   const groupId = parseInt(params.id || "0", 10);
-  const { data, isLoading, error } = useGroup(groupId);
-  const joinGroup = useJoinGroup();
   const { user } = useAuth();
+  const previewQuery = useGroupPreview(groupId);
+  const { data, isLoading, error } = previewQuery;
+  const joinGroup = useJoinGroup();
   const { toast } = useToast();
 
   const handleJoin = async () => {
@@ -85,7 +99,14 @@ export default function JoinGroup() {
           </p>
 
           <div className="relative z-10">
-            {isAlreadyMember ? (
+            {!user ? (
+              <Button 
+                asChild
+                className="w-full h-14 rounded-xl text-lg font-bold shadow-lg shadow-primary/20 hover-lift"
+              >
+                <a href={`/api/login?returnTo=/groups/${groupId}/join`}>Sign in with Google to Join</a>
+              </Button>
+            ) : isAlreadyMember ? (
               <div className="space-y-4">
                 <div className="bg-secondary/50 text-foreground font-medium py-3 rounded-xl">
                   You are already a member!

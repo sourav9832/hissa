@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2, Trash2, UserMinus } from "lucide-react";
+import { Receipt, Users, AlertCircle, ArrowLeft, TrendingDown, TrendingUp, CheckCircle2, Trash2, UserMinus, Paperclip } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -152,22 +152,34 @@ export default function GroupDetail() {
                     
                     return (
                       <div key={expense.id} className="p-4 sm:p-6 flex items-center justify-between hover:bg-secondary/20 transition-colors">
-                        <div className="flex items-center gap-4">
-                          <div className="hidden sm:flex flex-col items-center justify-center w-12 h-12 bg-secondary/50 rounded-xl text-muted-foreground">
-                            <span className="text-xs font-bold uppercase">{format(new Date(expense.createdAt), 'MMM')}</span>
-                            <span className="text-lg font-display text-foreground leading-none">{format(new Date(expense.createdAt), 'd')}</span>
+                        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                          <div className="flex flex-col items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-secondary/50 rounded-xl text-muted-foreground shrink-0">
+                            <span className="text-[10px] sm:text-xs font-bold uppercase">{format(new Date(expense.createdAt), 'MMM')}</span>
+                            <span className="text-sm sm:text-lg font-display text-foreground leading-none">{format(new Date(expense.createdAt), 'd')}</span>
                           </div>
                           
-                          <div>
-                            <p className="font-semibold text-foreground text-lg mb-0.5">{expense.description}</p>
-                            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground text-base sm:text-lg mb-0.5 truncate">{expense.description}</p>
+                            <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5">
                               <span className="font-medium text-foreground">{payerName}</span> paid {formatCurrency(expense.amount)}
                             </p>
                           </div>
                         </div>
                         
-                        <div className="text-right">
-                          <p className="font-display font-bold text-lg">{formatCurrency(expense.amount)}</p>
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          {expense.receipt && (
+                            <a
+                              href={`/api/groups/${groupId}/expenses/${expense.id}/receipt`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-full hover:bg-secondary/50 text-muted-foreground hover:text-primary transition-colors"
+                              title={`View ${expense.receipt.fileName}`}
+                              data-testid={`receipt-download-${expense.id}`}
+                            >
+                              <Paperclip className="w-4 h-4" />
+                            </a>
+                          )}
+                          <p className="font-display font-bold text-base sm:text-lg">{formatCurrency(expense.amount)}</p>
                         </div>
                       </div>
                     )

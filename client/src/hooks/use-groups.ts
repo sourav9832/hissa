@@ -24,6 +24,12 @@ export interface GroupMember {
   user?: UserInfo; 
 }
 
+export interface ReceiptInfo {
+  id: number;
+  fileName: string;
+  fileType: string;
+}
+
 export interface Expense {
   id: number;
   groupId: number;
@@ -32,6 +38,7 @@ export interface Expense {
   amount: number;
   createdAt: string;
   paidBy?: UserInfo;
+  receipt?: ReceiptInfo;
 }
 
 export interface GroupBalance {
@@ -70,6 +77,7 @@ export function useGroup(id: number) {
       return res.json();
     },
     enabled: !!id,
+    refetchInterval: 15000,
   });
 }
 
