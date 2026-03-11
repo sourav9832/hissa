@@ -1,0 +1,91 @@
+ubuntu@ip-172-31-12-193:~/hissa$ pm2 logs hissa --lines 5
+[TAILING] Tailing last 5 lines for [hissa] process (change the value with --lines option)
+/home/ubuntu/.pm2/logs/hissa-out.log last 5 lines:
+0|hissa    | V1R6AdjQUqVNgNV/gLFON2pU4OsUqVJAelEkyEnxTGlSqhAE0BO1KlTAA96A0qVAA96KlSoAWaY0qVNAIU9KlTEI9DUZY+aVKgB6B+lKlQAQ+mhH1UqVAgxTGlSoARFBIcRNilSpMDFvQOYxAAO/SoVVWsC7KpZehI6UqVZMtDXN7cvblWlJAkXA/FDxC7uDZQjmt6Pp9t6VKsH2W+jEldnfUxJJ3J800ZOetKlWr6JLlmA11Hn7/0rr+PRqbm5bBypBGCQB+KVKuL8j90ax/VmfxhVUQ6VA/dg7Cs2HqT70qVdcejmYMzM3U96VKlVCP/2Q==","createdAt":"2026-03-11T12:28:22.298Z"},"members":[{"id":1,"groupId":1,"userId":"106340019628481242889","joinedAt":"2026-03-11T12:28:22.302Z","user":{"id":"106340019628481242889","email":"business.adience@gmail.com","firstName":"Adience","lastName":"IT Services and Consultancy","profileImageUrl":"https://lh3.googleusercontent.com/a/ACg8ocL0Rr5CyEfNLskX9o45hqOw56TXSnC17jZXY27SK-StCNwT4bbz=s96-c","createdAt":"2026-03-11T11:56:22.042Z","updatedAt":"2026-03-11T12:24:45.865Z"}}],"expenses":[],"balances":[]}
+0|hissa    | 12:31:34 PM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+0|hissa    | 12:31:34 PM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+
+/home/ubuntu/.pm2/logs/hissa-error.log last 5 lines:
+0|hissa    | ReferenceError: __dirname is not defined
+0|hissa    |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa    |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa    |
+0|hissa    | Node.js v20.20.1
+
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
+0|hissa  | /home/ubuntu/hissa/server/static.ts:6
+0|hissa  |   const distPath = path.resolve(__dirname, "public");
+0|hissa  |                                 ^
+0|hissa  | ReferenceError: __dirname is not defined
+0|hissa  |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa  |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa  | Node.js v20.20.1
