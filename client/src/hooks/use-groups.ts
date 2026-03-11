@@ -7,6 +7,8 @@ export interface Group {
   name: string;
   imageData?: string;
   createdAt: string;
+  totalExpenses?: number;
+  yourContribution?: number;
 }
 
 export interface UserInfo {

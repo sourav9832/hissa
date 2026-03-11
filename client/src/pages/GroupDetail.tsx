@@ -389,36 +389,85 @@ export default function GroupDetail() {
       </Dialog>
 
       <Dialog open={showSettlingTip} onOpenChange={setShowSettlingTip}>
-        <DialogContent className="sm:max-w-[450px] rounded-2xl">
+        <DialogContent className="sm:max-w-[500px] rounded-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-xl flex items-center gap-2">
               <Lightbulb className="w-5 h-5 text-primary" />
               Settling Tip
             </DialogTitle>
             <DialogDescription>
-              Here's the simplest way to settle up all balances with the fewest transactions.
+              Breakdown of expenses and how to settle up with the fewest payments.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 mt-2">
-            {getSettlements().length === 0 ? (
-              <div className="text-center py-6">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
-                <p className="font-semibold text-lg">All settled up!</p>
-                <p className="text-sm text-muted-foreground">No payments needed.</p>
-              </div>
-            ) : (
-              getSettlements().map((s, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-secondary/30 gap-3">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="font-semibold truncate">{getMemberFirstName(s.from)}</span>
-                    <ArrowRight className="w-4 h-4 text-primary shrink-0" />
-                    <span className="font-semibold truncate">{getMemberFirstName(s.to)}</span>
+
+          {(() => {
+            const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+            const fairShare = members.length > 0 ? Math.round(totalExpenses / members.length) : 0;
+            const settlements = getSettlements();
+
+            return (
+              <div className="space-y-5 mt-2">
+                <div className="bg-primary/5 rounded-2xl p-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm font-medium text-muted-foreground">Total Expenses</span>
+                    <span className="font-display font-bold text-lg">{formatCurrency(totalExpenses)}</span>
                   </div>
-                  <span className="font-display font-bold text-primary text-lg shrink-0">{formatCurrency(s.amount)}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-muted-foreground">Per Person ({members.length} members)</span>
+                    <span className="font-display font-bold text-lg">{formatCurrency(fairShare)}</span>
+                  </div>
                 </div>
-              ))
-            )}
-          </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Who Paid What</h4>
+                  {members.map(m => {
+                    const name = getMemberFirstName(m.userId);
+                    const paid = expenses.filter(e => e.paidByUserId === m.userId).reduce((sum, e) => sum + e.amount, 0);
+                    const diff = paid - fairShare;
+                    return (
+                      <div key={m.userId} className="flex items-center justify-between p-3 rounded-xl bg-secondary/20">
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={m.user?.profileImageUrl} />
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs">{getInitials(name)}</AvatarFallback>
+                          </Avatar>
+                          <span className="font-medium">{name}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-display font-semibold block">{formatCurrency(paid)}</span>
+                          <span className={cn("text-xs", diff > 0 ? "text-emerald-600" : diff < 0 ? "text-destructive" : "text-muted-foreground")}>
+                            {diff > 0 ? `+${formatCurrency(diff)} extra` : diff < 0 ? `${formatCurrency(Math.abs(diff))} short` : "Even"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Settle Up</h4>
+                  {settlements.length === 0 ? (
+                    <div className="text-center py-4">
+                      <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-1" />
+                      <p className="font-semibold">All settled up!</p>
+                    </div>
+                  ) : (
+                    settlements.map((s, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10 gap-3">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="font-semibold truncate">{getMemberFirstName(s.from)}</span>
+                          <ArrowRight className="w-4 h-4 text-primary shrink-0" />
+                          <span className="font-semibold truncate">{getMemberFirstName(s.to)}</span>
+                        </div>
+                        <span className="font-display font-bold text-primary text-lg shrink-0">{formatCurrency(s.amount)}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
           <DialogFooter>
             <Button variant="outline" className="rounded-full" onClick={() => setShowSettlingTip(false)}>
               Got it

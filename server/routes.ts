@@ -13,7 +13,17 @@ export async function registerRoutes(
   app.get(api.groups.list.path, isAuthenticated, async (req: any, res) => {
     const userId = req.user.id;
     const groups = await storage.getGroupsForUser(userId);
-    res.json(groups);
+
+    const enriched = await Promise.all(groups.map(async (group) => {
+      const expenseList = await storage.getGroupExpenses(group.id);
+      const totalExpenses = expenseList.reduce((sum, e) => sum + e.amount, 0);
+      const yourContribution = expenseList
+        .filter(e => e.paidByUserId === userId)
+        .reduce((sum, e) => sum + e.amount, 0);
+      return { ...group, totalExpenses, yourContribution };
+    }));
+
+    res.json(enriched);
   });
 
   app.post(api.groups.create.path, isAuthenticated, async (req: any, res) => {

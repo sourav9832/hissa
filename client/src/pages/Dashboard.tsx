@@ -13,8 +13,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Users, Plus, Loader2, ArrowRight, Upload, X } from "lucide-react";
+import { Users, Plus, Loader2, ArrowRight, Upload, X, IndianRupee } from "lucide-react";
 import { format } from "date-fns";
+import { formatCurrency } from "@/lib/utils";
 
 const COLORS = ['bg-blue-500', 'bg-purple-500', 'bg-pink-500', 'bg-orange-500', 'bg-green-500', 'bg-cyan-500', 'bg-red-500', 'bg-indigo-500'];
 
@@ -197,9 +198,16 @@ export default function Dashboard() {
                       
                       <div>
                         <h3 className="text-lg sm:text-xl font-bold text-white mb-1 line-clamp-2">{group.name}</h3>
-                        <p className="text-white/80 text-xs sm:text-sm">
-                          Created {format(new Date(group.createdAt), 'MMM d, yyyy')}
-                        </p>
+                        <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-white/80 text-xs sm:text-sm">
+                          {(group.totalExpenses ?? 0) > 0 ? (
+                            <>
+                              <span>Total: {formatCurrency(group.totalExpenses!)}</span>
+                              <span>You paid: {formatCurrency(group.yourContribution ?? 0)}</span>
+                            </>
+                          ) : (
+                            <span>No expenses yet</span>
+                          )}
+                        </div>
                       </div>
 
                       <Button className="rounded-full hover-lift gap-2 w-full">
