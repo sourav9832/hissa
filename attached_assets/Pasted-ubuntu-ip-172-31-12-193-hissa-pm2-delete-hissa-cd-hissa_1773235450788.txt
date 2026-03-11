@@ -1,0 +1,113 @@
+ubuntu@ip-172-31-12-193:~/hissa$ pm2 delete hissa
+cd ~/hissa
+git pull origin main
+[PM2] Applying action deleteProcessId on app [hissa](ids: [ 0 ])
+[PM2] [hissa](0) ✓
+┌────┬───────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name      │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+└────┴───────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+From https://github.com/sourav9832/hissa
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+ubuntu@ip-172-31-12-193:~/hissa$ head -10 server/static.ts
+import express, { type Express } from "express";
+import fs from "fs";
+import path from "path";
+
+export function serveStatic(app: Express) {
+  const distPath = path.resolve(__dirname, "public");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`,
+    );
+ubuntu@ip-172-31-12-193:~/hissa$ cd ~/hissa
+git pull origin main
+head -7 server/static.ts
+remote: Enumerating objects: 102, done.
+remote: Counting objects: 100% (102/102), done.
+remote: Compressing objects: 100% (26/26), done.
+remote: Total 84 (delta 59), reused 83 (delta 58), pack-reused 0 (from 0)
+Unpacking objects: 100% (84/84), 691.27 KiB | 5.86 MiB/s, done.
+From https://github.com/sourav9832/hissa
+ * branch            main       -> FETCH_HEAD
+   9e92865..45c3a48  main       -> origin/main
+Updating 9e92865..45c3a48
+Fast-forward
+ .gitignore                                                                                       |   1 -
+ attached_assets/Pasted--PM2-Saving-current-process-list-PM2-Successfully-saved_1773227775010.txt |  48 ++++++++++
+ attached_assets/Pasted--hissa-pm2-logs-hissa-lines-5-TAILING-Tailing-last-5-li_1773235160418.txt |  78 ++++++++++++++++
+ attached_assets/Pasted-12-193-hissa-curl-http-localhost-5000-DOCTYPE-html-html_1773228362640.txt |  29 ++++++
+ attached_assets/Pasted-ubuntu-ip-172-31-12-193-hissa-cd-hissa-npm-install-NODE_1773234720470.txt |  60 ++++++++++++
+ attached_assets/Pasted-ubuntu-ip-172-31-12-193-hissa-pm2-logs-hissa-lines-5-TA_1773234899195.txt |  91 +++++++++++++++++++
+ attached_assets/image_1773227712875.png                                                          | Bin 0 -> 10875 bytes
+ attached_assets/image_1773229148837.png                                                          | Bin 0 -> 61719 bytes
+ attached_assets/image_1773229902848.png                                                          | Bin 0 -> 13224 bytes
+ attached_assets/image_1773230116892.png                                                          | Bin 0 -> 11913 bytes
+ attached_assets/image_1773232808668.png                                                          | Bin 0 -> 32125 bytes
+ client/src/components/ShareDialog.tsx                                                            |   4 +-
+ client/src/hooks/use-groups.ts                                                                   |  41 +++++++++
+ client/src/pages/GroupDetail.tsx                                                                 | 120 +++++++++++++++++++++++-
+ client/src/pages/JoinGroup.tsx                                                                   |  18 +++-
+ dist/index.cjs                                                                                   | 434 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ dist/public/assets/hissa-landing_1772987072753-Cq1sYek2.png                                      | Bin 0 -> 1249024 bytes
+ dist/public/assets/hissa-logo_1772991802141-DHy5_R-a.png                                         | Bin 0 -> 308006 bytes
+ dist/public/assets/index-BsAC64dm.js                                                             |  56 ++++++++++++
+ dist/public/assets/index-CalXnRcL.css                                                            |   1 +
+ dist/public/favicon.png                                                                          | Bin 0 -> 1145 bytes
+ dist/public/index.html                                                                           |  16 ++++
+ server/auth/googleAuth.ts                                                                        |   5 +-
+ server/routes.ts                                                                                 |  41 +++++++++
+ server/static.ts                                                                                 |  21 +++--
+ server/storage.ts                                                                                |  23 +++++
+ 26 files changed, 1068 insertions(+), 19 deletions(-)
+ create mode 100644 attached_assets/Pasted--PM2-Saving-current-process-list-PM2-Successfully-saved_1773227775010.txt
+ create mode 100644 attached_assets/Pasted--hissa-pm2-logs-hissa-lines-5-TAILING-Tailing-last-5-li_1773235160418.txt
+ create mode 100644 attached_assets/Pasted-12-193-hissa-curl-http-localhost-5000-DOCTYPE-html-html_1773228362640.txt
+ create mode 100644 attached_assets/Pasted-ubuntu-ip-172-31-12-193-hissa-cd-hissa-npm-install-NODE_1773234720470.txt
+ create mode 100644 attached_assets/Pasted-ubuntu-ip-172-31-12-193-hissa-pm2-logs-hissa-lines-5-TA_1773234899195.txt
+ create mode 100644 attached_assets/image_1773227712875.png
+ create mode 100644 attached_assets/image_1773229148837.png
+ create mode 100644 attached_assets/image_1773229902848.png
+ create mode 100644 attached_assets/image_1773230116892.png
+ create mode 100644 attached_assets/image_1773232808668.png
+ create mode 100644 dist/index.cjs
+ create mode 100644 dist/public/assets/hissa-landing_1772987072753-Cq1sYek2.png
+ create mode 100644 dist/public/assets/hissa-logo_1772991802141-DHy5_R-a.png
+ create mode 100644 dist/public/assets/index-BsAC64dm.js
+ create mode 100644 dist/public/assets/index-CalXnRcL.css
+ create mode 100644 dist/public/favicon.png
+ create mode 100644 dist/public/index.html
+import express, { type Express } from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+export function serveStatic(app: Express) {
+  const currentDir = typeof __dirname !== "undefined" ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+ubuntu@ip-172-31-12-193:~/hissa$ set -a; source ~/hissa/.env; set +a
+NODE_ENV=production pm2 start npx --name "hissa" -- tsx server/index.ts
+pm2 save
+pm2 logs hissa --lines 5
+[PM2] Starting /usr/bin/npx in fork_mode (1 instance)
+[PM2] Done.
+┌────┬──────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name     │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼──────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0  │ hissa    │ default     │ N/A     │ fork    │ 11360    │ 0s     │ 0    │ online    │ 0%       │ 18.1mb   │ ubuntu   │ disabled │
+└────┴──────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /home/ubuntu/.pm2/dump.pm2
+[TAILING] Tailing last 5 lines for [hissa] process (change the value with --lines option)
+/home/ubuntu/.pm2/logs/hissa-out.log last 5 lines:
+0|hissa    | V1R6AdjQUqVNgNV/gLFON2pU4OsUqVJAelEkyEnxTGlSqhAE0BO1KlTAA96A0qVAA96KlSoAWaY0qVNAIU9KlTEI9DUZY+aVKgB6B+lKlQAQ+mhH1UqVAgxTGlSoARFBIcRNilSpMDFvQOYxAAO/SoVVWsC7KpZehI6UqVZMtDXN7cvblWlJAkXA/FDxC7uDZQjmt6Pp9t6VKsH2W+jEldnfUxJJ3J800ZOetKlWr6JLlmA11Hn7/0rr+PRqbm5bBypBGCQB+KVKuL8j90ax/VmfxhVUQ6VA/dg7Cs2HqT70qVdcejmYMzM3U96VKlVCP/2Q==","createdAt":"2026-03-11T12:28:22.298Z"},"members":[{"id":1,"groupId":1,"userId":"106340019628481242889","joinedAt":"2026-03-11T12:28:22.302Z","user":{"id":"106340019628481242889","email":"business.adience@gmail.com","firstName":"Adience","lastName":"IT Services and Consultancy","profileImageUrl":"https://lh3.googleusercontent.com/a/ACg8ocL0Rr5CyEfNLskX9o45hqOw56TXSnC17jZXY27SK-StCNwT4bbz=s96-c","createdAt":"2026-03-11T11:56:22.042Z","updatedAt":"2026-03-11T12:24:45.865Z"}}],"expenses":[],"balances":[]}
+0|hissa    | 12:31:34 PM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+0|hissa    | 12:31:34 PM [express] GET /api/auth/user 401 in 1ms :: {"message":"Unauthorized"}
+
+/home/ubuntu/.pm2/logs/hissa-error.log last 5 lines:
+0|hissa    | ReferenceError: __dirname is not defined
+0|hissa    |     at serveStatic (/home/ubuntu/hissa/server/static.ts:6:33)
+0|hissa    |     at <anonymous> (/home/ubuntu/hissa/server/index.ts:82:5)
+0|hissa    |
+0|hissa    | Node.js v20.20.1
+
+0|hissa  | 1:23:42 PM [express] serving on port 5000
