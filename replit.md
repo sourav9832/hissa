@@ -12,7 +12,7 @@ A full-stack shared expense tracking application similar to Splitwise. Built wit
 - **Frontend**: React 18 + Vite + TailwindCSS + shadcn/ui
 - **Backend**: Express.js + TypeScript
 - **Database**: PostgreSQL + Drizzle ORM
-- **Auth**: Replit Auth (OIDC)
+- **Auth**: Google OAuth 2.0 (Passport.js)
 - **Deployment Target**: AWS EC2 Ubuntu (not Replit paid deployment)
 
 ## Key Features Implemented
@@ -46,9 +46,10 @@ A full-stack shared expense tracking application similar to Splitwise. Built wit
 - Member join functionality
 - Share group invite dialog
 
-### 6. Replit Auth Integration
-- User registration/login via Replit ID
-- User data from Replit profile (firstName, lastName, email, profileImageUrl)
+### 6. Google OAuth Integration
+- User registration/login via Google account
+- User data from Google profile (firstName, lastName, email, profileImageUrl)
+- Session stored in PostgreSQL via connect-pg-simple
 
 ## Database Schema
 
@@ -113,9 +114,10 @@ Page to join groups via invite link
 - **Form Components**: Using shadcn/ui with react-hook-form validation
 
 ## Environment Variables
-- `SESSION_SECRET` - Replit Auth session secret
-- `REPL_ID` - Replit environment ID
+- `SESSION_SECRET` - Session encryption secret
 - `DATABASE_URL` - PostgreSQL connection string
+- `GOOGLE_CLIENT_ID` - Google OAuth 2.0 client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth 2.0 client secret
 
 ## File Structure
 ```
@@ -139,6 +141,10 @@ client/
       queryClient.ts
 
 server/
+  auth/
+    googleAuth.ts          (Google OAuth 2.0)
+    storage.ts             (User upsert/fetch)
+    index.ts               (Auth exports)
   storage.ts
   routes.ts
   index.ts
