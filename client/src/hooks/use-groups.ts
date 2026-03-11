@@ -9,6 +9,7 @@ export interface Group {
   createdAt: string;
   totalExpenses?: number;
   yourContribution?: number;
+  isCreator?: boolean;
 }
 
 export interface UserInfo {

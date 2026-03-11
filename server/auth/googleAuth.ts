@@ -73,20 +73,13 @@ export async function setupAuth(app: Express) {
   });
 
   app.get("/api/login", (req: any, res, next) => {
-    if (req.query.returnTo) {
-      req.session.returnTo = req.query.returnTo;
-      req.session.save(() => {
-        passport.authenticate("google", {
-          scope: ["profile", "email"],
-          prompt: "select_account",
-        })(req, res, next);
-      });
-    } else {
-      passport.authenticate("google", {
-        scope: ["profile", "email"],
-        prompt: "select_account",
-      })(req, res, next);
-    }
+    const returnTo = req.query.returnTo || "/";
+    const state = Buffer.from(JSON.stringify({ returnTo })).toString("base64url");
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      prompt: "select_account",
+      state,
+    })(req, res, next);
   });
 
   app.get("/api/auth/google/callback",
@@ -94,11 +87,17 @@ export async function setupAuth(app: Express) {
       failureRedirect: "/",
     }),
     (req: any, res) => {
-      const returnTo = req.session.returnTo || "/";
-      delete req.session.returnTo;
-      req.session.save(() => {
-        res.redirect(returnTo);
-      });
+      let returnTo = "/";
+      try {
+        const stateParam = req.query.state as string;
+        if (stateParam) {
+          const decoded = JSON.parse(Buffer.from(stateParam, "base64url").toString());
+          if (decoded.returnTo && decoded.returnTo.startsWith("/")) {
+            returnTo = decoded.returnTo;
+          }
+        }
+      } catch {}
+      res.redirect(returnTo);
     }
   );
 

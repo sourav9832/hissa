@@ -192,8 +192,15 @@ export default function Dashboard() {
                     
                     {/* Content */}
                     <div className="relative z-10 p-6 flex flex-col h-full justify-between">
-                      <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                        <span className="text-lg sm:text-xl font-bold text-white">{initials}</span>
+                      <div className="flex items-start justify-between">
+                        <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                          <span className="text-lg sm:text-xl font-bold text-white">{initials}</span>
+                        </div>
+                        {!group.isCreator && (
+                          <span className="bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                            Invited
+                          </span>
+                        )}
                       </div>
                       
                       <div>

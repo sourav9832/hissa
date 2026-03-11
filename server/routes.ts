@@ -20,7 +20,10 @@ export async function registerRoutes(
       const yourContribution = expenseList
         .filter(e => e.paidByUserId === userId)
         .reduce((sum, e) => sum + e.amount, 0);
-      return { ...group, totalExpenses, yourContribution };
+      const members = await storage.getGroupMembers(group.id);
+      const sorted = [...members].sort((a, b) => new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime());
+      const isCreator = sorted.length > 0 && sorted[0].userId === userId;
+      return { ...group, totalExpenses, yourContribution, isCreator };
     }));
 
     res.json(enriched);
